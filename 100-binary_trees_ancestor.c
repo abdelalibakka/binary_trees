@@ -9,35 +9,53 @@
  */
 binary_tree_t *binary_trees_ancestor(const binary_tree_t *first, const binary_tree_t *second)
 {
+    size_t depth_first, depth_second;
+
     if (!first || !second)
         return NULL;
 
-    if (first == second)
-        return (binary_tree_t *)first;
+    depth_first = binary_tree_depth(first);
+    depth_second = binary_tree_depth(second);
 
-    if (binary_tree_is_descendant(second, first))
-        return (binary_tree_t *)first;
+    while (depth_first > depth_second)
+    {
+        first = first->parent;
+        depth_first--;
+    }
 
-    if (binary_tree_is_descendant(first, second))
-        return (binary_tree_t *)second;
+    while (depth_second > depth_first)
+    {
+        second = second->parent;
+        depth_second--;
+    }
 
-    return binary_trees_ancestor(first->parent, second->parent);
+    while (first && second)
+    {
+        if (first == second)
+            return (binary_tree_t *)first;
+
+        first = first->parent;
+        second = second->parent;
+    }
+
+    return NULL;
 }
 
 /**
- * binary_tree_is_descendant - Checks if a node is descendant of another node
- * @node: The node to check if it's a descendant
- * @target: The potential ancestor node
+ * binary_tree_depth - Calculates the depth of a node in a binary tree
+ * @node: The node to calculate the depth for
  *
- * Return: 1 if @node is a descendant of @target, 0 otherwise
+ * Return: Depth of the node
  */
-int binary_tree_is_descendant(const binary_tree_t *node, const binary_tree_t *target)
+size_t binary_tree_depth(const binary_tree_t *node)
 {
-    if (!node)
-        return 0;
+    size_t depth = 0;
 
-    if (node == target)
-        return 1;
+    while (node)
+    {
+        depth++;
+        node = node->parent;
+    }
 
-    return binary_tree_is_descendant(node->parent, target);
+    return depth;
 }
